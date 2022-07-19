@@ -1,0 +1,40 @@
+﻿@{
+    string assetType = ViewContext.RouteData.Values["type"].ToString();
+    ViewData["Title"] = $"Buy {assetType}";
+    @model BOL.BuyAssetBOL;
+}
+
+<div class="row">
+    <div class="col-12">
+        <h1>Buy @assetType</h1>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6 col-12">
+        <form action="buysubmit" method="post">
+            <div class="mb-3">
+                <label for="formGroupExampleInput" class="form-label">Asset Name</label>
+                <select class="form-control">
+                    <option value="AAPL">Apple (AAPL)</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Quantity</label>
+                <input type="text" class="form-control" id="formGroupExampleInput2">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Current Price</label>
+                <input type="text" class="form-control" id="formGroupExampleInput2" value="150.52">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Total Amount</label>
+                <input type="text" class="form-control" id="formGroupExampleInput2" readonly value="0">
+            </div>
+            <div class="mb-3">
+                <button class="btn btn-success w-100" type="submit">Confirm</button>
+                <a href="~/" class="btn btn-primary w-100 mt-2" type="submit">To Dashboard</a>
+            </div>
+        </form>
+    </div>
+</div>
