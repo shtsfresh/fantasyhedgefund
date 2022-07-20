@@ -18,6 +18,7 @@ namespace Fantasy_Hedge_Fund.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
+                await _utilitiesService.InitAssets();
                 return RedirectToAction("Index", "Dashboard");
             }
             return View();

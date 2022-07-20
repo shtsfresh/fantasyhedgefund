@@ -9,5 +9,7 @@ namespace BLL.Interfaces
     public interface IUtilitiesService
     {
         public Task<bool> IsDatabaseLive();
+
+        public Task<bool> InitAssets();
     }
 }

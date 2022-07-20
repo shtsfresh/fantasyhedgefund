@@ -10,5 +10,8 @@ namespace DAL
             : base(options)
         {
         }
+
+        public DbSet<AssetDAL> Assets { get; set; }
+        public DbSet<TransactionDAL> Transactions { get; set; }
     }
 }
