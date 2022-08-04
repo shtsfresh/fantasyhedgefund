@@ -1,5 +1,14 @@
-﻿@{
+﻿@inject BLL.Interfaces.ITransactionService _transactionService;
+@inject BLL.Interfaces.IAssetService _assetService;
+@using System.Security.Claims;
+@{
     ViewData["Title"] = "Portfolio";
+    Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString());
+    List<BOL.TransactionBOL> transactions = await _transactionService.GetAllForUser(userId);
+    List<BOL.AssetBOL> holdings = (await _assetService.GetHoldingsForUser(userId)).Where(h => h.Class != BOL.Enums.EAssetClass.Cash).ToList();
+    double TotalFundValue = await _assetService.GetTotalHoldingValueForUser(userId);
+    double CashOnHand = await _assetService.GetAmountByAssetClassForUser(BOL.Enums.EAssetClass.Cash, userId);
+    double Performance = await _assetService.GetPerformanceForUser(userId) * 100;
 }
 
 <div class="row">
@@ -12,19 +21,19 @@
 
 <div class="row mt-4">
     <div class="col-md-4">
-        <div class="card text-white bg-primary mb-3 w-100">
-            <div class="card-header">Fund Current Value $48.27</div>
+        <div class="card text-white bg-dark mb-3 w-100">
+            <div class="card-header">Fund Current Value $@TotalFundValue.ToString("0.00")</div>
             <div class="card-body">
-                <h5 class="card-title">+41.09%</h5>
+                <h5 class="card-title">@Performance.ToString("0.00")%</h5>
                 <p class="card-text">Fund performance KPI</p>
             </div>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card text-white bg-primary mb-3">
-            <div class="card-header">$10 Scheduled Deposit in 6 days 5 minutes 2 seconds</div>
+        <div class="card text-white bg-dark mb-3">
+            <div class="card-header">$10 will be deposited on the next Monday</div>
             <div class="card-body">
-                <h5 class="card-title">$56.19</h5>
+                <h5 class="card-title">$@CashOnHand.ToString("0.00")</h5>
                 <p class="card-text">Cash On Hand</p>
             </div>
         </div>
@@ -42,7 +51,7 @@
 <div class="row mt-4">
     <div class="col-12">
         <table class="table table-striped table-hover">
-            <thead>
+            <thead class="table-dark">
                 <tr>
                     <th scope="col">Asset Class</th>
                     <th scope="col">Asset Name</th>
@@ -53,44 +62,26 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <th scope="row">Crypto</th>
-                    <td>Bitcoin</td>
-                    <td>0.0003</td>
-                    <td>$29900</td>
-                    <td>$8.97</td>
-                    <td><a class="btn btn-sm btn-outline-danger" href="~/asset/sell/123">Sell</a></td>
-                </tr>
-                <tr>
-                    <th scope="row">Stock</th>
-                    <td>AAPL</td>
-                    <td>1</td>
-                    <td>$149.35</td>
-                    <td>$149.35</td>
-                    <td><a class="btn btn-sm btn-outline-danger" href="~/asset/sell/123">Sell</a></td>
-                </tr>
-                <tr>
-                    <th scope="row">Crypto</th>
-                    <td>Ethereum</td>
-                    <td>5</td>
-                    <td>$1544.84</td>
-                    <td>$7724.18</td>
-                    <td><a class="btn btn-sm btn-outline-danger" href="~/asset/sell/123">Sell</a></td>
-                </tr>
+                @foreach (BOL.AssetBOL holding in holdings)
+                {
+                    <tr>
+                        <th>@holding.Class</th>
+                        <th>@holding.Name (@holding.ShortName)</th>
+                        <th>@holding.Quantity</th>
+                        <th>$@holding.Price</th>
+                        <th>$@((holding.Quantity*holding.Price).ToString("0.00"))</th>
+                        <th><a href="~/asset/@holding.Id.ToString()/sell" class="btn btn-sm btn-outline-danger">Sell</a></th>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>
 </div>
 
 <div class="row mt-4">
-    <div class="col-6">
-        <a href="~/asset/buy/stock" class="btn btn-success w-100" type="button">
-            <i class="fa fa-money-bill-trend-up me-2"></i> Buy Stock
-        </a>
-    </div>
-    <div class="col-6">
-        <a href="~/asset/buy/crypto" class="btn btn-success w-100" type="button">
-            <i class="fa fa-bitcoin me-2"></i> Buy Crypto
+    <div class="col-12">
+        <a href="~/asset/trade" class="btn btn-success w-100" type="button">
+            <i class="fa fa-money-bill-trend-up me-2"></i> Trade
         </a>
     </div>
 </div>
@@ -106,33 +97,43 @@
 <div class="row mt-4">
     <div class="col-12">
         <table class="table table-striped table-hover">
-            <thead>
+            <thead class="table-dark">
                 <tr>
+                    <th>Date & Time</th>
                     <th scope="col">Action</th>
                     <th scope="col">Asset Name</th>
                     <th scope="col">Quantity</th>
                     <th scope="col">Price Acted</th>
+                    <th scope="col">Total Amount</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <th scope="row">Buy</th>
-                    <td>Bitcoin</td>
-                    <td>0.0003</td>
-                    <td>$8.97</td>
-                </tr>
-                <tr>
-                    <th scope="row">Sell</th>
-                    <td>AAPL</td>
-                    <td>1</td>
-                    <td>$149.35</td>
-                </tr>
-                <tr>
-                    <th scope="row">Buy</th>
-                    <td>Ethereum</td>
-                    <td>1</td>
-                    <td>$2302.51</td>
-                </tr>
+                @foreach (BOL.TransactionBOL transaction in transactions)
+                {
+                    <tr>
+                        <th>
+                            @transaction.Date
+                        </th>
+                        @{
+                            if (transaction.Type == BOL.Enums.ETransactionType.Buy)
+                            {
+                                <th>Buy</th>
+                            }
+                            else if (transaction.Type == BOL.Enums.ETransactionType.Sell)
+                            {
+                                <th>Sell</th>
+                            }
+                            else if (transaction.Type == BOL.Enums.ETransactionType.Draw)
+                            {
+                                <th>Draw</th>
+                            }
+                        }
+                        <th>@transaction.AssetLongName (@transaction.AssetShortName)</th>
+                        <th>@transaction.Quantity.ToString("0.00")</th>
+                        <th>@transaction.Price.ToString("0.00")</th>
+                        <th>@((transaction.Price*transaction.Quantity).ToString("0.00"))</th>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>

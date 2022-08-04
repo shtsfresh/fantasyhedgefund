@@ -15,5 +15,6 @@ namespace DAL
         public double Price { get; set; }
 
         public List<TransactionDAL> Transactions { get; set; }
+        public List<HoldingDAL> Holdings { get; set; }
     }
 }

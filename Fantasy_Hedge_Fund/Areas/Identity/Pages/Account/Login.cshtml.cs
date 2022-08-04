@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 
 namespace Fantasy_Hedge_Fund.Areas.Identity.Pages.Account
 {
@@ -21,11 +22,15 @@ namespace Fantasy_Hedge_Fund.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private BLL.Interfaces.IAssetService _assetService;
 
-        public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<IdentityUser> signInManager,
+            ILogger<LoginModel> logger,
+            BLL.Interfaces.IAssetService assetService)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _assetService = assetService;
         }
 
         /// <summary>
@@ -113,6 +118,7 @@ namespace Fantasy_Hedge_Fund.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
+                    await _assetService.ApplyWeeklyDraws(Input.Email);
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)

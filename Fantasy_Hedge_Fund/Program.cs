@@ -17,6 +17,8 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<MainDbContext>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IUtilitiesService, UtilitiesService>();
+builder.Services.AddTransient<ITransactionService, TransactionService>();
+builder.Services.AddTransient<IAssetService, AssetService>();
 
 var app = builder.Build();
 

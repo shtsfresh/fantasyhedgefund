@@ -1,35 +1,37 @@
-﻿@{
-    string assetType = ViewContext.RouteData.Values["type"].ToString();
-    ViewData["Title"] = $"Buy {assetType}";
-    @model BOL.BuyAssetBOL;
+﻿@inject BLL.Interfaces.IAssetService _assetService;
+@using System.Security.Claims;
+@{
+    @model BOL.TransactionBOL;
+    Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString());
+    BOL.AssetBOL assetBOL = await _assetService.GetById(Guid.Parse(ViewData["assetId"].ToString()));
+    ViewData["Title"] = $"Buy {assetBOL.ShortName}";
+    double CashOnHand = await _assetService.GetAmountByAssetClassForUser(BOL.Enums.EAssetClass.Cash, userId);
 }
 
 <div class="row">
     <div class="col-12">
-        <h1>Buy @assetType</h1>
+        <h1>Buy @assetBOL.ShortName</h1>
     </div>
 </div>
 
 <div class="row mt-4">
     <div class="col-md-6 col-12">
-        <form action="buysubmit" method="post">
+        <form action="~/asset/buysubmit" method="post">
             <div class="mb-3">
-                <label for="formGroupExampleInput" class="form-label">Asset Name</label>
-                <select class="form-control">
-                    <option value="AAPL">Apple (AAPL)</option>
-                </select>
+                <label class="form-label">Asset Name</label>
+                <input type="text" class="form-control" asp-for="AssetId" value="@assetBOL.Id" readonly />
             </div>
             <div class="mb-3">
                 <label class="form-label">Quantity</label>
-                <input type="text" class="form-control" id="formGroupExampleInput2">
+                <input type="number" step="0.00000001" min="0" max="@(CashOnHand / assetBOL.Price)" class="form-control" asp-for="Quantity" />
             </div>
             <div class="mb-3">
                 <label class="form-label">Current Price</label>
-                <input type="text" class="form-control" id="formGroupExampleInput2" value="150.52">
+                <input type="number" step="0.01" class="form-control" asp-for="Price" value="@assetBOL.Price" readonly />
             </div>
             <div class="mb-3">
                 <label class="form-label">Total Amount</label>
-                <input type="text" class="form-control" id="formGroupExampleInput2" readonly value="0">
+                <input type="number" step="0.01" class="form-control" id="TotalAmount" readonly value="0">
             </div>
             <div class="mb-3">
                 <button class="btn btn-success w-100" type="submit">Confirm</button>
@@ -38,3 +40,18 @@
         </form>
     </div>
 </div>
+
+@section scripts {
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#Quantity").on("input", function() {
+            $("#TotalAmount").val($("#Price").val()*$("#Quantity").val());
+        });
+    });
+    $(document).ready(function () {
+        $("#Price").on("input", function() {
+            $("#TotalAmount").val($("#Price").val()*$("#Quantity").val());
+        });
+    });
+</script>
+}

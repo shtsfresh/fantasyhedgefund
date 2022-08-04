@@ -1,0 +1,64 @@
+﻿@{
+    ViewData["Title"] = $"Trade";
+}
+
+<div class="row">
+    <div class="col-12">
+        <h1>Trade</h1>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <table id="tradeTable" class="table table-hover bg-white">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Asset Class</th>
+                    <th scope="col">Asset Name</th>
+                    <th scope="col">Short Name</th>
+                    <th scope="col">Current Price</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+@section scripts {
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#tradeTable").DataTable({
+            serverSide: true,
+            processing: true,
+            ordering: false,
+            ajax: {
+               url: "trade/getassets",
+               type: "POST",
+               datatype: "json"
+            },
+            dom: 'Plfrtip',
+            columns: [
+                {data: "class"},
+                {data: "name"},
+                {data: "shortName"},
+                {data: "price"},
+                {data: ""}
+            ],
+            columnDefs: [
+                {
+                targets: [0], render: function (a, b, data, d) {
+                    return data["class"].toString().replace(0,"Crypto").replace(1,"Stock").replace(2,"Cash");}
+                },
+                {
+                targets: [4], render: function (a, b, data, d) {
+                    return '<a href="' + data.id + '/buy" class="btn btn-outline-primary">Buy</a>';}
+                },
+                {
+                  "defaultContent": "",
+                  "targets": "_all"
+                }
+            ]
+        });
+    });
+</script>
+}

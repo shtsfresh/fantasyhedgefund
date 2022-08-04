@@ -15,6 +15,7 @@ namespace DAL
         public double Price { get; set; }
         public double Quantity { get; set; }
         public double TotalAmount { get; set; }
+        public int Type { get; set; }
 
         public AssetDAL Asset { get; set; }
     }

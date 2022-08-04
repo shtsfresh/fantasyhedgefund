@@ -4,6 +4,7 @@ using DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fantasy_Hedge_Fund.Data.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220722103845_update3")]
+    partial class update3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,29 +47,6 @@ namespace Fantasy_Hedge_Fund.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Assets");
-                });
-
-            modelBuilder.Entity("DAL.HoldingDAL", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<double>("Amount")
-                        .HasColumnType("float");
-
-                    b.Property<Guid>("AssetId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AssetId");
-
-                    b.ToTable("Holdings");
                 });
 
             modelBuilder.Entity("DAL.TransactionDAL", b =>
@@ -306,17 +285,6 @@ namespace Fantasy_Hedge_Fund.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("DAL.HoldingDAL", b =>
-                {
-                    b.HasOne("DAL.AssetDAL", "Asset")
-                        .WithMany("Holdings")
-                        .HasForeignKey("AssetId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Asset");
-                });
-
             modelBuilder.Entity("DAL.TransactionDAL", b =>
                 {
                     b.HasOne("DAL.AssetDAL", "Asset")
@@ -381,8 +349,6 @@ namespace Fantasy_Hedge_Fund.Data.Migrations
 
             modelBuilder.Entity("DAL.AssetDAL", b =>
                 {
-                    b.Navigation("Holdings");
-
                     b.Navigation("Transactions");
                 });
 #pragma warning restore 612, 618

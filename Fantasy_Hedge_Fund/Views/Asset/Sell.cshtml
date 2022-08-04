@@ -1,5 +1,57 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@inject BLL.Interfaces.IAssetService _assetService;
+@using System.Security.Claims;
 @{
+    @model BOL.TransactionBOL;
+    Guid assetId = Guid.Parse(ViewData["assetId"].ToString());
+    BOL.AssetBOL assetBOL = await _assetService.GetById(assetId);
+    Guid userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value.ToString());
+    ViewData["Title"] = $"Sell {assetBOL.ShortName}";
+    double availableAmount = await _assetService.GetHoldingAmountForUser(assetBOL.Id, userId);
+}
+
+<div class="row">
+    <div class="col-12">
+        <h1>Sell @assetBOL.ShortName</h1>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6 col-12">
+        <form action="~/asset/sellsubmit" method="post">
+            <div class="mb-3">
+                <label class="form-label">Asset Name</label>
+                <input type="text" class="form-control" asp-for="AssetId" value="@assetBOL.Id" readonly />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Quantity</label>
+                <input type="number" step="0.00000001" max="@availableAmount" class="form-control" asp-for="Quantity" />
+                <label class="form-label text-success">Available amount: @availableAmount</label>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Current Price</label>
+                <input type="number" step="0.01" class="form-control" asp-for="Price" value="@assetBOL.Price" readonly />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Total Amount</label>
+                <input type="text" step="0.01" class="form-control" id="TotalAmount" readonly value="0">
+            </div>
+            <div class="mb-3">
+                <button class="btn btn-success w-100" type="submit">Confirm</button>
+                <a href="~/" class="btn btn-primary w-100 mt-2" type="submit">To Dashboard</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section scripts {
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#Quantity").on("input", function() {
+            $("#TotalAmount").val($("#Price").val()*$("#Quantity").val());
+        });
+        $("#Price").on("input", function() {
+            $("#TotalAmount").val($("#Price").val()*$("#Quantity").val());
+        });
+    });
+</script>
 }

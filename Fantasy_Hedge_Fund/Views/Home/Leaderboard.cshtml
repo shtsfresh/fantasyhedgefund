@@ -1,5 +1,38 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "Leaderboard";
 }
+@model List<BOL.LeaderboardItemBOL>;
+
+<div class="row">
+    <div class="col-12">
+        <h1>
+            Leaderboard
+        </h1>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Username</th>
+                    <th scope="col">Holdings</th>
+                    <th scope="col">Transactions</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (BOL.LeaderboardItemBOL leaderboardItem in Model)
+                {
+                    <tr>
+                        <th>@leaderboardItem.Username</th>
+                        <th>$@leaderboardItem.Holdings.ToString("0.00")</th>
+                        <th>@leaderboardItem.Transactions</th>
+                        <th><a href="~/home/ledger/@leaderboardItem.UserId.ToString()" class="btn btn-sm btn-outline-primary">View ledger</a></th>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

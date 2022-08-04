@@ -44,7 +44,7 @@ namespace BLL.Services
             await _db.AddAsync(new DAL.AssetDAL
             {
                 Id = Guid.NewGuid(),
-                Class = (int)(object)EAssetClass.Crypto,
+                Class = (int)EAssetClass.Crypto,
                 Name = "Tether",
                 ShortName = "USDT",
                 Price = 1
@@ -54,7 +54,7 @@ namespace BLL.Services
             await _db.AddAsync(new DAL.AssetDAL
             {
                 Id = Guid.NewGuid(),
-                Class = (int)(object)EAssetClass.Stock,
+                Class = (int)EAssetClass.Stock,
                 Name = "Microsoft",
                 ShortName = "MSFT",
                 Price = 259.53
@@ -64,7 +64,7 @@ namespace BLL.Services
             await _db.AddAsync(new DAL.AssetDAL
             {
                 Id = Guid.NewGuid(),
-                Class = (int)(object)EAssetClass.Cash,
+                Class = (int)EAssetClass.Cash,
                 Name = "Cash",
                 ShortName = "Cash",
                 Price = 1
