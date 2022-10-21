@@ -13,6 +13,7 @@ namespace DAL
         public string Name { get; set; }
         public string ShortName { get; set; }
         public double Price { get; set; }
+        public DateTime? LastPriceUpdate { get; set; }
 
         public List<TransactionDAL> Transactions { get; set; }
         public List<HoldingDAL> Holdings { get; set; }

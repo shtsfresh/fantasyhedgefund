@@ -11,6 +11,7 @@ using BOL.Enums;
 using DAL;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace BLL.Services
 {
@@ -73,17 +74,44 @@ namespace BLL.Services
 
         public async Task<AssetFilterResult> GetAllFiltered(string q = null, int skip = 0, int pageSize = 10)
         {
-            IQueryable<AssetDAL> query = _db.Assets.AsNoTracking();
+            IQueryable<AssetDAL> query = _db.Assets;
 
             if (q != null)
             {
                 query = query.Where(a => a.Name.Contains(q) || a.ShortName.Contains(q));
             }
 
+            var assets = await query
+            .OrderBy(o => o.Name)
+            .Skip(skip)
+            .Take(pageSize).ToListAsync();
+
+            bool priceUpdated = false;
+            assets.ForEach(async x =>
+            {
+                if (x.LastPriceUpdate == null)
+                {
+                    await UpdatePrice(x);
+                    x.LastPriceUpdate = DateTime.Now;
+                    priceUpdated = true;
+                }
+                else if (DateTime.Now >= ((DateTime)x.LastPriceUpdate).AddSeconds(-30))
+                {
+                    await UpdatePrice(x);
+                    x.LastPriceUpdate = DateTime.Now;
+                    priceUpdated = true;
+                }
+            });
+
+            if (priceUpdated)
+            {
+                await _db.SaveChangesAsync();
+            }
+
             var result = new BOL.AssetFilterResult
             {
-                Count = await query.CountAsync(),
-                Assets = await query.Select(asset => new AssetBOL
+                Count = assets.Count(),
+                Assets = assets.Select(asset => new AssetBOL
                 {
                     Id = asset.Id,
                     Class = (EAssetClass)asset.Class,
@@ -91,10 +119,7 @@ namespace BLL.Services
                     Price = asset.Price,
                     ShortName = asset.ShortName
                 })
-                .OrderBy(o => o.Name)
-                .Skip(skip)
-                .Take(pageSize)
-                .ToListAsync()
+                .ToList()
             };
 
             return result;
@@ -110,16 +135,25 @@ namespace BLL.Services
 
         public async Task<AssetBOL> GetById(Guid id)
         {
-            return await _db.Assets.AsNoTracking()
-                .Where(a => a.Id == id)
-                .Select(asset => new AssetBOL
-                {
-                    Id = asset.Id,
-                    Class = (EAssetClass)asset.Class,
-                    Name = asset.Name,
-                    Price = asset.Price,
-                    ShortName = asset.ShortName
-                }).FirstAsync();
+            var assetDAL = await _db.Assets
+                .Where(a => a.Id == id).FirstAsync();
+
+            await UpdatePrice(assetDAL);
+
+            if (assetDAL.Class == (int)EAssetClass.Stock)
+            {
+                assetDAL.LastPriceUpdate = DateTime.Now;
+                await _db.SaveChangesAsync();
+            }
+
+            return new AssetBOL
+            {
+                Id = assetDAL.Id,
+                Class = (EAssetClass)assetDAL.Class,
+                Name = assetDAL.Name,
+                Price = assetDAL.Price,
+                ShortName = assetDAL.ShortName
+            };
         }
 
         public async Task<double> GetHoldingAmountForUser(Guid assetId, Guid userId)
@@ -134,8 +168,34 @@ namespace BLL.Services
         public async Task<List<AssetBOL>> GetHoldingsForUser(Guid userId)
         {
             string uid = userId.ToString();
+
+            var query = _db.Holdings.Where(h => h.UserId == uid);
+
+            var assets = query.Select(x => x.Asset).ToList();
+
+            bool priceUpdated = false;
+            assets.ForEach(async x =>
+            {
+                if (x.LastPriceUpdate == null)
+                {
+                    await UpdatePrice(x);
+                    x.LastPriceUpdate = DateTime.Now;
+                    priceUpdated = true;
+                }
+                else if (DateTime.Now >= ((DateTime)x.LastPriceUpdate).AddSeconds(-30))
+                {
+                    await UpdatePrice(x);
+                    x.LastPriceUpdate = DateTime.Now;
+                    priceUpdated = true;
+                }
+            });
+
+            if (priceUpdated)
+            {
+                await _db.SaveChangesAsync();
+            }
+
             return await _db.Holdings.Where(h => h.UserId == uid)
-                //.Where(h => h.Asset.Class != (int)BOL.Enums.EAssetClass.Cash)
                 .Select(h => new BOL.AssetBOL
                 {
                     Id = h.AssetId,
@@ -149,6 +209,7 @@ namespace BLL.Services
 
         public async Task<bool> UpdatePrices()
         {
+            bool addnew = false;
             var existingAssets = await _db.Assets.ToListAsync();
             WebClient client = new WebClient();
             List<CryptoAPIItemBOL> apiItems = new List<CryptoAPIItemBOL>();
@@ -157,9 +218,10 @@ namespace BLL.Services
             {
                 string url = $"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page={i * 250}&page={i}&sparkline=false";
                 apiItems.Clear();
-                using (var webclient = new WebClient())
+                var uri = new System.Uri(url);
+                using (var webclient = new HttpClient())
                 {
-                    string result = client.DownloadString(url);
+                    string result = client.DownloadString(uri);
                     apiItems = JsonConvert.DeserializeObject<List<CryptoAPIItemBOL>>(result);
                 }
 
@@ -185,7 +247,10 @@ namespace BLL.Services
                             Price = (item.Current_Price == null ? 0 : (double)item.Current_Price),
                             ShortName = item.Name
                         };
-                        await _db.Assets.AddAsync(assetDAL);
+                        if (addnew)
+                        {
+                            await _db.Assets.AddAsync(assetDAL);
+                        }
                     }
                 }
             }
@@ -239,6 +304,60 @@ namespace BLL.Services
             leaderboardItems = leaderboardItems.OrderByDescending(l => l.Holdings).ToList();
 
             return leaderboardItems;
+        }
+
+        public async Task<double> UpdatePrice(AssetDAL assetDAL)
+        {
+            if (assetDAL.Class == (int)EAssetClass.Stock)
+            {
+                string encodedParams = $"symbol={assetDAL.ShortName.ToString()}";
+                string options = "method=POST&url=https://yahoo-finance97.p.rapidapi.com/stock-info&headers=content-type:application/x-www-form-urlencoded&X-RapidAPI-Key=44ba73ce6fmsh992f70e99036ab9p12c6bcjsn154e36bf2498&X-RapidAPI-Host=yahoo-finance97.p.rapidapi.com&data=" + encodedParams;
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://yahoo-finance97.p.rapidapi.com/stock-info");
+                request.Headers.Add("X-RapidAPI-Key", "44ba73ce6fmsh992f70e99036ab9p12c6bcjsn154e36bf2498");
+                request.Method = "POST";
+                request.ContentType = "application/x-www-form-urlencoded";
+
+                using (StreamWriter streamOut = new StreamWriter(request.GetRequestStream()))
+                {
+                    streamOut.Write(encodedParams);
+                    streamOut.Flush();
+                    streamOut.Close();
+                    using (StreamReader streamIn = new StreamReader(request.GetResponse().GetResponseStream()))
+                    {
+                        var resultString = streamIn.ReadToEnd();
+                        JObject resultObject = JObject.Parse(resultString);
+                        var price = double.Parse(resultObject["data"]["ask"].ToString());
+                        assetDAL.Price = price;
+                        return price;
+                    }
+                }
+            }
+            return 0;
+        }
+
+        public async Task<bool> AddUpdateAsset(AssetBOL asset)
+        {
+            var assetDAL = await _db.Assets
+                .Where(x => x.ShortName == asset.ShortName)
+                .FirstOrDefaultAsync();
+
+            if (assetDAL != null)
+            {
+                _db.Remove(assetDAL);
+            }
+
+            await _db.Assets.AddAsync(new AssetDAL
+            {
+                Id = Guid.NewGuid(),
+                Class = (int)asset.Class,
+                Price = asset.Price,
+                Name = asset.Name,
+                ShortName = asset.ShortName
+            });
+
+            await _db.SaveChangesAsync();
+
+            return true;
         }
     }
 }

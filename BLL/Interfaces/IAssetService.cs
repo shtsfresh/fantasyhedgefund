@@ -5,14 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 using BOL;
 using BOL.Enums;
+using DAL;
 
 namespace BLL.Interfaces
 {
     public interface IAssetService
     {
+        public Task<bool> AddUpdateAsset(AssetBOL asset);
         public Task<List<AssetBOL>> GetAll();
         public Task<AssetFilterResult> GetAllFiltered(string q, int skip, int pageSize);
         public Task<bool> UpdatePrices();
+        public Task<double> UpdatePrice(AssetDAL assetDAL);
         public Task<BOL.AssetBOL> GetById(Guid id);
         public Task<List<AssetBOL>> GetHoldingsForUser(Guid userId);
         public Task<double> GetHoldingAmountForUser(Guid assetId, Guid userId);

@@ -67,6 +67,51 @@ namespace Fantasy_Hedge_Fund.Controllers
         [Route("trade")]
         public async Task<IActionResult> Trade()
         {
+            //var assetBOL = new BOL.AssetBOL
+            //{
+            //    Id = Guid.NewGuid(),
+            //    Class = BOL.Enums.EAssetClass.Stock,
+            //    Name = "Amazon",
+            //    Price = 0,
+            //    ShortName = "AMZN"
+            //};
+            //await _assetService.AddUpdateAsset(assetBOL);
+            //assetBOL = new BOL.AssetBOL
+            //{
+            //    Id = Guid.NewGuid(),
+            //    Class = BOL.Enums.EAssetClass.Stock,
+            //    Name = "Microsoft",
+            //    Price = 0,
+            //    ShortName = "MSFT"
+            //};
+            //await _assetService.AddUpdateAsset(assetBOL);
+            //assetBOL = new BOL.AssetBOL
+            //{
+            //    Id = Guid.NewGuid(),
+            //    Class = BOL.Enums.EAssetClass.Stock,
+            //    Name = "Tesla",
+            //    Price = 0,
+            //    ShortName = "TSLA"
+            //};
+            //await _assetService.AddUpdateAsset(assetBOL);
+            //assetBOL = new BOL.AssetBOL
+            //{
+            //    Id = Guid.NewGuid(),
+            //    Class = BOL.Enums.EAssetClass.Stock,
+            //    Name = "Apple",
+            //    Price = 0,
+            //    ShortName = "AAPL"
+            //};
+            //await _assetService.AddUpdateAsset(assetBOL);
+            //assetBOL = new BOL.AssetBOL
+            //{
+            //    Id = Guid.NewGuid(),
+            //    Class = BOL.Enums.EAssetClass.Stock,
+            //    Name = "Bayerische Motoren Werke AG",
+            //    Price = 0,
+            //    ShortName = "BMW"
+            //};
+            //await _assetService.AddUpdateAsset(assetBOL);
             return View();
         }
 
