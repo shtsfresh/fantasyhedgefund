@@ -81,10 +81,15 @@ namespace BLL.Services
                 query = query.Where(a => a.Name.Contains(q) || a.ShortName.Contains(q));
             }
 
+            int count = await query
+            .OrderBy(o => o.Name).CountAsync();
+
+
             var assets = await query
             .OrderBy(o => o.Name)
             .Skip(skip)
             .Take(pageSize).ToListAsync();
+
 
             bool priceUpdated = false;
             assets.ForEach(async x =>
@@ -110,7 +115,7 @@ namespace BLL.Services
 
             var result = new BOL.AssetFilterResult
             {
-                Count = assets.Count(),
+                Count = count,
                 Assets = assets.Select(asset => new AssetBOL
                 {
                     Id = asset.Id,

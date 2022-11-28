@@ -2,72 +2,210 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="apple-touch-icon" sizes="76x76" href="~/img/apple-icon.png">
+    <link rel="icon" type="image/png" href="~/img/favicon.png">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
+
+    <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+    <!-- Nucleo Icons -->
+    <link href="~/css/nucleo-icons.css" rel="stylesheet" />
+    <link href='https://fonts.googleapis.com/css?family=VT323' rel='stylesheet'>
+
+    <!-- CSS Files -->
+
+
     <title>@ViewData["Title"] - Fantasy Hedge Fund</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/css/site.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css" />
-    @*<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />*@
-    @*<link rel="stylesheet" href="~/Fantasy_Hedge_Fund.styles.css" asp-append-version="true" />*@
 </head>
-<body>
+
+<body class=" ">
+    
+  <div class="wrapper ">
+
     @if (User.Identity.IsAuthenticated)
     {
-        <header>
-            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
-                <div class="container-fluid">
-                    <a class="navbar-brand" href="~/">
-                        Fantasy Hedge Fund
-                    </a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="navbar-collapse collapse d-sm-inline-flex">
-                        <ul class="navbar-nav">
-                            @if (!User.Identity.IsAuthenticated)
+         <div class="sidebar">
+    
+      <div class="sidebar-wrapper">
+        <ul class="nav">
+
+             @if (!User.Identity.IsAuthenticated)
                             {
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                                </li>
-                            }
+          <li class="active ">
+            <a href="index.html">
+              <i class="tim-icons icon-chart-pie-36"></i>
+              <p>Dashboard</p>
+            </a>
+          </li>
+           }
                             else
                             {
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-area="" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
-                                </li>
-                            }
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Leaderboard">Leaderboard</a>
-                            </li>
-                        </ul>
-                        <partial name="_LoginPartial" />
-                    </div>
-                </div>
-            </nav>
-        </header>
+                                <li class="active ">
+            <a href="index.html">
+              <i class="tim-icons icon-chart-pie-36"></i>
+              <p>Home</p>
+            </a>
+          </li>
+           }
+          <li>
+            <a href="leaderboard.html">
+              <i class="tim-icons icon-atom"></i>
+              <p>Leaderboard</p>
+            </a>
+          </li>
+          <li>
+            <a href="ledger.html">
+              <i class="tim-icons icon-single-02"></i>
+              <p>Ledger</p>
+            </a>
+          </li>
+          <li>
+            <a href="trade.html">
+              <i class="tim-icons icon-puzzle-10"></i>
+              <p>Trade</p>
+            </a>
+          </li>
+        </ul>
+        <partial name="_LoginPartial" />
+      </div>
+    </div>
+       
     }
 
-    <div class="container">
-        <main role="main" class="pb-3">
+     <div class="main-panel">
             @RenderBody()
-        </main>
-    </div>
+     </div>
 
     @if (User.Identity.IsAuthenticated)
     {
-        <footer class="border-top footer text-muted">
-            <div class="container">
-                &copy; 2022 - Fantasy_Hedge_Fund
-            </div>
-        </footer>
+      <footer class="footer">
+          <div class="copyright float-right">
+            ©
+            <script>
+              document.write(new Date().getFullYear())
+            </script> -
+            <a href="index.html" target="_blank">Fantasy_Hedge_Fund</a> 
+          </div>
+      </footer>
     }
 
+    </div>
+
+    <!--   Core JS Files   -->
+    <script src="~/js/core/jquery.min.js" asp-append-version="true"></script>
+    <script src="~/js/core/popper.min.js" asp-append-version="true"></script>
+    <script src="~/js/core/bootstrap.min.js" asp-append-version="true"></script>
+    <script src="~/js/plugins/perfect-scrollbar.jquery.min.js" asp-append-version="true"></script>
+    <script src="~/js/plugins/chartjs.min.js" asp-append-version="true"></script>
+    <script src="~/js/main.js" type="text/javascript" asp-append-version="true"></script>
+    <script src="~/js/chart.js"></script>
+
     <script src="https://kit.fontawesome.com/e1731d2d00.js" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.js"></script>
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+     <script>
+
+      $(document).ready(function() {
+        $().ready(function() {
+          $sidebar = $('.sidebar');
+          $navbar = $('.navbar');
+
+          $full_page = $('.full-page');
+
+          $sidebar_responsive = $('body > .navbar-collapse');
+          sidebar_mini_active = true;
+          white_color = false;
+
+          window_width = $(window).width();
+
+          fixed_plugin_open = $('.sidebar .sidebar-wrapper .nav li.active a p').html();
+
+
+
+          $('.fixed-plugin a').click(function(event) {
+            // Alex if we click on switch, stop propagation of the event, so the dropdown will not be hide, otherwise we set the  section active
+            if ($(this).hasClass('switch-trigger')) {
+              if (event.stopPropagation) {
+                event.stopPropagation();
+              } else if (window.event) {
+                window.event.cancelBubble = true;
+              }
+            }
+          });
+
+          $('.fixed-plugin .background-color span').click(function() {
+            $(this).siblings().removeClass('active');
+            $(this).addClass('active');
+
+            var new_color = $(this).data('color');
+
+            if ($sidebar.length != 0) {
+              $sidebar.attr('data-color', new_color);
+            }
+
+            if ($navbar.length != 0) {
+              $navbar.attr('data-color', new_color);
+            }
+
+            if ($full_page.length != 0) {
+              $full_page.attr('filter-color', new_color);
+            }
+
+            if ($sidebar_responsive.length != 0) {
+              $sidebar_responsive.attr('data-color', new_color);
+            }
+          });
+
+          $('.switch-sidebar-mini input').on("switchChange.bootstrapSwitch", function() {
+            var $btn = $(this);
+
+            if (sidebar_mini_active == true) {
+              $('body').removeClass('sidebar-mini');
+              sidebar_mini_active = false;
+              blackDashboard.showSidebarMessage('Sidebar mini deactivated...');
+            } else {
+              $('body').addClass('sidebar-mini');
+              sidebar_mini_active = true;
+              blackDashboard.showSidebarMessage('Sidebar mini activated...');
+            }
+
+            // we simulate the window Resize so the charts will get updated in realtime.
+            var simulateWindowResize = setInterval(function() {
+              window.dispatchEvent(new Event('resize'));
+            }, 180);
+
+            // we stop the simulation of Window Resize after the animations are completed
+            setTimeout(function() {
+              clearInterval(simulateWindowResize);
+            }, 1000);
+          });
+
+
+          $('.light-badge').click(function() {
+            $('body').addClass('white-content');
+          });
+
+          $('.dark-badge').click(function() {
+            $('body').removeClass('white-content');
+          });
+        });
+      });
+    
+    </script>
+    <script>
+      $(document).ready(function() {
+        // Javascript method's body can be found in assets/js/demos.js
+        demo.initDashboardPageCharts();
+
+      });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

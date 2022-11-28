@@ -3,57 +3,99 @@
 }
 @model List<BOL.TransactionBOL>;
 
-<div class="row">
-    <div class="col-12">
-        <h1>
-            Ledger
-        </h1>
-        <h3>For user: @Model.First().Username</h3>
-        <h3>Total transactions: @Model.Count</h3>
-    </div>
-</div>
 
-<div class="row mt-4">
-    <div class="col-12">
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th scope="col">Date & Time</th>
-                    <th scope="col">Action</th>
-                    <th scope="col">Asset Name</th>
-                    <th scope="col">Quantity</th>
-                    <th scope="col">Price Acted</th>
-                    <th scope="col">Total Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (BOL.TransactionBOL transaction in Model)
-                {
-                    <tr>
-                        <th>
-                            @transaction.Date
-                        </th>
-                        @{
-                            if (transaction.Type == BOL.Enums.ETransactionType.Buy)
-                            {
-                                <th>Buy</th>
-                            }
-                            else if (transaction.Type == BOL.Enums.ETransactionType.Sell)
-                            {
-                                <th>Sell</th>
-                            }
-                            else if (transaction.Type == BOL.Enums.ETransactionType.Draw)
-                            {
-                                <th>Draw</th>
-                            }
-                        }
-                        <th>@transaction.AssetLongName (@transaction.AssetShortName)</th>
-                        <th>@transaction.Quantity.ToString("0.00")</th>
-                        <th>@transaction.Price.ToString("0.00")</th>
-                        <th>@((transaction.Price*transaction.Quantity).ToString("0.00"))</th>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-</div>
+     <!-- Navbar -->
+            <nav class="navbar navbar-expand-lg navbar-absolute navbar-transparent   ">
+                <div class="container-fluid">
+                    <div class="navbar-wrapper">
+                        <div class="navbar-toggle d-inline">
+                            <button type="button" class="navbar-toggler">
+                                <span class="navbar-toggler-bar bar1"></span>
+                                <span class="navbar-toggler-bar bar2"></span>
+                                <span class="navbar-toggler-bar bar3"></span>
+                            </button>
+                        </div>
+                        <a class="navbar-brand" href="index.html">Fantasy Hedge Fund</a>
+                    </div>
+                   
+                </div>
+            </nav>
+           
+            <!-- End Navbar -->
+            <div class="content">
+              <div>
+                <h2 class="main-heading main-heading-leaderboard text-white">Ledger</h2>
+              </div>
+              <br>
+    <h3>For user: @Model.First().Username</h3>
+    <h3>Total transactions: @Model.Count</h3>
+               <br>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12">
+                        <div class="card ">
+                            <form action="">
+                                <input type="text" placeholder="Search..." name="" id="">
+                            </form>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table tablesorter " id="">
+                                        <thead class=" text-primary">
+                                            <th>
+                                                Action
+                                            </th>
+                                            <th>
+                                                Name
+                                            </th>
+                                            <th>
+                                                Qty
+                                            </th>
+                                            <th>
+                                                Price Acted
+                                            </th>
+                                            <th>
+                                                Total
+                                            </th>
+                                            <th>
+                                                Date
+                                            </th>
+                                        </thead>
+                                        <tbody>
+                                @foreach (BOL.TransactionBOL transaction in Model)
+                                {
+                                    <tr>
+                                        
+                                        @{
+                                            if (transaction.Type == BOL.Enums.ETransactionType.Buy)
+                                            {
+                                                <td>Buy</td>
+                                            }
+                                            else if (transaction.Type == BOL.Enums.ETransactionType.Sell)
+                                            {
+                                                <td>Sell</td>
+                                            }
+                                            else if (transaction.Type == BOL.Enums.ETransactionType.Draw)
+                                            {
+                                                <td>Draw</td>
+                                            }
+                                        }
+                                        <td>@transaction.AssetLongName (@transaction.AssetShortName)</td>
+                                        <td>@transaction.Quantity.ToString("0.00")</td>
+                                        <td>@transaction.Price.ToString("0.00")</td>
+                                        <td>@((transaction.Price * transaction.Quantity).ToString("0.00"))</td>
+                                                <td>
+                                            @transaction.Date
+                                        </td>
+                                    </tr>
+                                }
+                                         
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            
+            </div>
+

@@ -3,36 +3,70 @@
 }
 @model List<BOL.LeaderboardItemBOL>;
 
-<div class="row">
-    <div class="col-12">
-        <h1>
-            Leaderboard
-        </h1>
-    </div>
-</div>
+     <!-- Navbar -->
+            <nav class="navbar navbar-expand-lg navbar-absolute navbar-transparent   ">
+                <div class="container-fluid">
+                    <div class="navbar-wrapper">
+                        <div class="navbar-toggle d-inline">
+                            <button type="button" class="navbar-toggler">
+                                <span class="navbar-toggler-bar bar1"></span>
+                                <span class="navbar-toggler-bar bar2"></span>
+                                <span class="navbar-toggler-bar bar3"></span>
+                            </button>
+                        </div>
+                        <a class="navbar-brand" href="index.html">Fantasy Hedge Fund</a>
+                    </div>
+                   
+                </div>
+            </nav>
+           
+            <!-- End Navbar -->
+            <div class="content">
+              <div class="bg-heading-yellow">
+                <h2 class="main-heading main-heading-leaderboard">Global Leaderboard</h2>
+              </div>
+               
+                <div class="row">
+                    <div class="col-lg-12 col-md-12">
+                        <div class="card ">
+                            <form action="">
+                                <input type="text" placeholder="Search..." name="" id="">
+                            </form>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table tablesorter " id="">
+                                        <thead class=" text-primary">
+                                            <th>
+                                                Name
+                                            </th>
+                                            <th>
+                                                Score
+                                            </th>
+                                            <th>
+                                                Transaction
+                                            </th>
+                                        </thead>
+                                        <tbody>
+                                             @foreach (BOL.LeaderboardItemBOL leaderboardItem in Model)
+                                             {
+                                                 <tr>
+                                        <td style="text-transform: none;">@leaderboardItem.Username</td>
+                        
+                                        <td>$@leaderboardItem.Holdings.ToString("0.00")</td>
+                                        <td>@leaderboardItem.Transactions</td>
+                                        <td><a href="~/home/ledger/@leaderboardItem.UserId.ToString()" class="btn-blue">View ledger</a></td>
+                                    </tr>
+                                }
+                                        
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-<div class="row mt-4">
-    <div class="col-12">
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th scope="col">Username</th>
-                    <th scope="col">Holdings</th>
-                    <th scope="col">Transactions</th>
-                    <th scope="col"></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (BOL.LeaderboardItemBOL leaderboardItem in Model)
-                {
-                    <tr>
-                        <th>@leaderboardItem.Username</th>
-                        <th>$@leaderboardItem.Holdings.ToString("0.00")</th>
-                        <th>@leaderboardItem.Transactions</th>
-                        <th><a href="~/home/ledger/@leaderboardItem.UserId.ToString()" class="btn btn-sm btn-outline-primary">View ledger</a></th>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-</div>
+            
+            </div>
+
+

@@ -4,33 +4,102 @@
     ViewData["Title"] = "Register";
 }
 
-<h1>@ViewData["Title"]</h1>
 
-<div class="row">
-    <div class="col-md-4">
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <hr />
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-floating">
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" />
-                <label asp-for="Input.Email"></label>
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
-            </div>
-            <div class="form-floating">
-                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" />
-                <label asp-for="Input.Password"></label>
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
-            </div>
-            <div class="form-floating">
-                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" />
-                <label asp-for="Input.ConfirmPassword"></label>
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-            </div>
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
-        </form>
-    </div>
-</div>
+  <canvas id="matrix-bg"> </canvas>
+       <div class="row d-flex justify-content-center align-items-center login-area-main" style="height: 100vh;">
+          <div class="col-md-6 m-4 align-self-center">
+                <div class="card login-area p-3 ">
+                    <div class="login-logo"><p>Fantasy Hedge Fund - @ViewData["Title"]</p></div>
+                    <div class="card-body">
+                <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                          <div class="row">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="col-md-12 pr-md-1 ">
+                              <div class="form-group">
+                                <label asp-for="Input.Email"></label>
+                                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" />
+                                <span asp-validation-for="Input.Email" class="text-danger" class="error-span"></span>
+                              </div>
+                            </div>
+                            <div class="col-md-12 pr-md-1 ">
+                                <div class="form-group">
+                                <label asp-for="Input.Password"></label>
+                                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" />
+                                <span asp-validation-for="Input.Password" class="text-danger"></span>
+                                </div>
+                              </div>
+                              <div class="col-md-12 pr-md-1 ">
+                                <div class="form-group">
+                                <label asp-for="Input.ConfirmPassword"></label>
+                                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" />
+                                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                                </div>
+                              </div>
+                              <div class="card-footer text-center w-100">
+                            <button id="registerSubmit" type="submit" class="btn btn-fill btn-primary w-100 mb-3">Register</button>
+                                <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl"  style="color: rgba(255, 255, 255, 0.6);">Already have an account? Login here</a>
+                              </div>
+                        </form>
+                      </div>
 
+                </div>
+            </div>
+        </div>
+
+  <script>
+      // geting canvas by Boujjou Achraf
+      var c = document.getElementById("matrix-bg");
+      var ctx = c.getContext("2d");
+
+      //making the canvas full screen
+      c.height = window.innerHeight;
+      c.width = window.innerWidth;
+
+      //chinese characters - taken from the unicode charset
+      var matrix = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789$%^&*()*&^%+-/~{[|`]}";
+      //converting the string into an array of single characters
+      matrix = matrix.split("");
+
+      var font_size = 10;
+      var columns = c.width/font_size; //number of columns for the rain
+      //an array of drops - one per column
+      var drops = [];
+      //x below is the x coordinate
+      //1 = y co-ordinate of the drop(same for every drop initially)
+      for(var x = 0; x < columns; x++)
+          drops[x] = 1; 
+
+      //drawing the characters
+      function draw()
+      {
+          //Black BG for the canvas
+          //translucent BG to show trail
+          ctx.fillStyle = "rgba(39, 41, 61, 0.04)";
+          ctx.fillRect(0, 0, c.width, c.height);
+
+          ctx.fillStyle = "#2d86fa";//green text
+          ctx.font = font_size + "px arial";
+          //looping over drops
+          for(var i = 0; i < drops.length; i++)
+          {
+              //a random chinese character to print
+              var text = matrix[Math.floor(Math.random()*matrix.length)];
+              //x = i*font_size, y = value of drops[i]*font_size
+              ctx.fillText(text, i*font_size, drops[i]*font_size);
+
+              //sending the drop back to the top randomly after it has crossed the screen
+              //adding a randomness to the reset to make the drops scattered on the Y axis
+              if(drops[i]*font_size > c.height && Math.random() > 0.975)
+                  drops[i] = 0;
+
+              //incrementing Y coordinate
+              drops[i]++;
+          }
+      }
+
+      setInterval(draw, 35);
+
+  </script>
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
