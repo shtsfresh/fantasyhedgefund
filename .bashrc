@@ -23,11 +23,14 @@ function menu() {
   printf '   \033[1m%-15s\033[0mb    ' build
   printf '%-50s\n' "Build fantasy hedge fund"
 
-  printf '   \033[1m%-15s\033[0ms    ' start
+  printf '   \033[1m%-15s\033[0mr    ' run
   printf '%-50s\n' "Start the server"
 
   printf '   \033[1m%-15s\033[0mu    ' update
-  printf '%-50s\n' "Update the nix environment"
+  printf '%-50s\n' "Update dev dependencies"
+
+  printf '   \033[1m%-15s\033[0mp    ' publish
+  printf '%-50s\n' "Build production docker image"
   echo 1>&2
 }
 
@@ -36,16 +39,9 @@ if [[ "$NO_MOTD" != "true" ]]; then
   menu 1>&2
 fi
 
-# Update the nix env
 function update() {
-  local procs
-
-  if ! procs="$(nproc 2> /dev/null)" || [[ "$procs" -lt 1 ]]; then
-    procs="1"
-  fi
-
-  rm "$REPO_ROOT/flake.lock"
-  nix --no-warn-dirty --experimental-features 'nix-command flakes' build --max-jobs "$procs" --out-link "$REPO_ROOT/.nix"
+  cd "$REPO_ROOT" || return 1
+  ./bin/fantasy.sh update "$@"
 }
 
 function u() {
@@ -53,11 +49,8 @@ function u() {
 }
 
 function build() {
-  cd "$REPO_ROOT/Fantasy_Hedge_Fund" && dotnet build "$@"
-}
-
-function start() {
-  cd "$REPO_ROOT/Fantasy_Hedge_Fund" && dotnet run "$@"
+  cd "$REPO_ROOT" || return 1
+  dotnet build "$@"
 }
 
 function b() {
@@ -65,10 +58,19 @@ function b() {
 }
 
 function start() {
-  cd "$REPO_ROOT/packages/web" || return 1
-  pnpm run start
+  cd "$REPO_ROOT" || return 1
+  dotnet run "$@"
 }
 
 function s() {
   start "$@"
+}
+
+function publish() {
+  cd "$REPO_ROOT" || return 1
+  docker build -t fantasy-hedge-fund -f Dockerfile .
+}
+
+function p() {
+  publish "$@"
 }

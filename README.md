@@ -8,12 +8,17 @@
 ./bin/fantasy.sh 
 ```
 
-#### Build
+#### Development build
 ```sh
 ./bin/fantasy.sh build
 ```
 
-#### Start
+#### Start app
 ```sh
-./bin/fantasy.sh start
+./bin/fantasy.sh run
+```
+
+#### Production build
+```sh
+./bin/fantasy.sh publish
 ```
