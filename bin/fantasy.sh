@@ -36,12 +36,12 @@ function update() {
     '. "$REPO_ROOT/.bashrc"; cd "$REPO_ROOT" && dotnet restore'
 }
 
-if ! [ -d "$REPO_ROOT/.nix" ]; then
-  update || exit 1
-
-elif [[ "$1" = "update" ]] || [[ "$1" = "u" ]]; then
+if [[ "$1" = "update" ]] || [[ "$1" = "u" ]]; then
   update || exit 1
   exit 0
+
+elif ! [ -d "$REPO_ROOT/.nix" ]; then
+  update || exit 1
 fi
 
 if [[ "$#" -gt 0 ]]; then
