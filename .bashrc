@@ -33,7 +33,7 @@ function menu() {
   printf '%-50s\n' "Build production docker image"
   
   printf '   \033[1m%-15s\033[0m     ' deploy
-  printf '%-50s\n' "Deploy app to azure"
+  printf '%-50s\n' "Deploy current build to azure"
 
   echo 1>&2
 }
@@ -50,12 +50,6 @@ function update() {
 
 function u() {
   update "$@"
-}
-
-function deploy() {
-  az acr login --name fantasyhedgefund || return 1
-  docker tag fantasy-hedge-fund:latest fantasyhedgefund.azurecr.io/app:latest || return 1
-  docker push fantasyhedgefund.azurecr.io/app
 }
 
 function build() {
@@ -82,9 +76,56 @@ function s() {
 
 function publish() {
   cd "$REPO_ROOT" || return 1
-  docker build -t fantasy-hedge-fund -f Dockerfile .
+
+  local currentBranch=""
+  local tag=""
+
+  if ! currentBranch="$(git rev-parse --abbrev-ref HEAD)" || [[ "$currentBranch" = "" ]]; then
+    echo "Error fetching branch name" 1>&2
+    return 1
+  fi
+
+  if [[ "$currentBranch" = "master" ]]; then
+    tag="latest"
+  else
+    tag="$currentBranch"
+  fi
+
+  docker build -t fantasy-hedge-fund:"$tag" -f Dockerfile .
 }
 
 function p() {
   publish "$@"
+}
+
+function deploy() {
+  local currentBranch=""
+  local tag=""
+
+  if ! currentBranch="$(git rev-parse --abbrev-ref HEAD)" || [[ "$currentBranch" = "" ]]; then
+    echo "Error fetching branch name" 1>&2
+    return 1
+  fi
+
+  case "$currentBranch" in
+    master)
+      tag="latest"
+      ;;
+    dev)
+      tag="$currentBranch"
+      ;;
+    *)
+      echo "Error: Only master and dev branches can be deployed" 1>&2
+      return 1
+      ;;
+  esac
+
+  az acr login --name fantasyhedgefund || return 1
+
+  if ! docker tag fantasy-hedge-fund:"$tag" fantasyhedgefund.azurecr.io/app:"$tag"; then
+    echo "Error: fantasy-hedge-fund:$tag not found. Have you run publish yet?" 1>&2
+    return 1
+  fi
+
+  docker push fantasyhedgefund.azurecr.io/app:"$tag"
 }
