@@ -31,6 +31,10 @@ function menu() {
 
   printf '   \033[1m%-15s\033[0mp    ' publish
   printf '%-50s\n' "Build production docker image"
+  
+  printf '   \033[1m%-15s\033[0m     ' deploy
+  printf '%-50s\n' "Deploy app to azure"
+
   echo 1>&2
 }
 
@@ -46,6 +50,12 @@ function update() {
 
 function u() {
   update "$@"
+}
+
+function deploy() {
+  az acr login --name fantasyhedgefund || return 1
+  docker tag fantasy-hedge-fund:latest fantasyhedgefund.azurecr.io/app:latest || return 1
+  docker push fantasyhedgefund.azurecr.io/app
 }
 
 function build() {
