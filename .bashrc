@@ -68,7 +68,11 @@ function b() {
 }
 
 function start() {
-  cd "$REPO_ROOT" || return 1
+  echo
+  echo "Starting app at https://localhost:7209 ..."
+  echo
+
+  cd "$REPO_ROOT/Fantasy_Hedge_Fund" || return 1
   dotnet run "$@"
 }
 
